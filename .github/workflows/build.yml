@@ -1,0 +1,28 @@
+name: Build
+
+on:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    # @see https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
+    concurrency:
+      group: ${{ github.workflow }}-${{ matrix.os }}-${{ github.ref }}
+      cancel-in-progress: true
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/initialize
+      - uses: mlugg/setup-zig@v1
+        with:
+          version: 0.13.0
+      - name: Zig Build and Test
+        run: |
+          zig version
+          zig build test
