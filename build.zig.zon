@@ -1,71 +1,71 @@
 .{
-    // This is the default name used by packages depending on this one. For
-    // example, when a user runs `zig fetch --save <url>`, this field is used
-    // as the key in the `dependencies` table. Although the user can choose a
-    // different name, most users will stick with this provided value.
+    // これは、このパッケージに依存するパッケージがデフォルトで使用する名前である。
+    // 例えば、ユーザーが `zig fetch --save <url>` を実行すると、
+    // `dependencies` テーブルのキーとしてこのフィールドの値が使用される。
+    // ユーザーは別の名前を選択することもできるが、ほとんどのユーザーは
+    // ここで提供された値をそのまま使用する。
     //
-    // It is redundant to include "zig" in this name because it is already
-    // within the Zig package namespace.
+    // すでに Zig のパッケージ名前空間内にあるため、この名前に "zig" を含めるのは冗長である。
     .name = "zag",
 
-    // This is a [Semantic Version](https://semver.org/).
-    // In a future version of Zig it will be used for package deduplication.
+    // これは [セマンティックバージョン](https://semver.org/) である。
+    // 将来の Zig のバージョンでは、パッケージの重複排除に使用される予定。
     .version = "0.0.0",
 
-    // This field is optional.
-    // This is currently advisory only; Zig does not yet do anything
-    // with this value.
+    // このフィールドはオプションである。
+    // 現時点では参考情報にすぎず、Zig はこの値をまだ使用しない。
     //.minimum_zig_version = "0.11.0",
 
-    // This field is optional.
-    // Each dependency must either provide a `url` and `hash`, or a `path`.
-    // `zig build --fetch` can be used to fetch all dependencies of a package, recursively.
-    // Once all dependencies are fetched, `zig build` no longer requires
-    // internet connectivity.
+    // このフィールドはオプションである。
+    // 各依存関係は `url` と `hash` のペア、または `path` のいずれかを指定する必要がある。
+    // `zig build --fetch` を使用すると、パッケージのすべての依存関係を再帰的に取得できる。
+    // すべての依存関係が取得されると、`zig build` はもはやインターネット接続を必要としない。
     .dependencies = .{
-        // See `zig fetch --save <url>` for a command-line interface for adding dependencies.
+        // 依存関係を追加するコマンドラインインターフェースについては、
+        // `zig fetch --save <url>` を参照のこと。
         //.example = .{
-        //    // When updating this field to a new URL, be sure to delete the corresponding
-        //    // `hash`, otherwise you are communicating that you expect to find the old hash at
-        //    // the new URL.
+        //    // このフィールドを新しい URL に更新する際は、
+        //    // 対応する `hash` を削除すること。
+        //    // そうしないと、新しい URL に古いハッシュがあることを期待していると解釈される。
         //    .url = "https://example.com/foo.tar.gz",
         //
-        //    // This is computed from the file contents of the directory of files that is
-        //    // obtained after fetching `url` and applying the inclusion rules given by
-        //    // `paths`.
+        //    // これは、`url` から取得した後に適用される `paths` の
+        //    // ルールに基づいて生成されたディレクトリ内のファイル内容から計算される。
         //    //
-        //    // This field is the source of truth; packages do not come from a `url`; they
-        //    // come from a `hash`. `url` is just one of many possible mirrors for how to
-        //    // obtain a package matching this `hash`.
+        //    // このフィールドが唯一の信頼できる情報源である。
+        //    // パッケージは `url` から取得されるのではなく、`hash` から取得される。
+        //    // `url` はこの `hash` に一致するパッケージを取得する手段の 1 つにすぎない。
         //    //
-        //    // Uses the [multihash](https://multiformats.io/multihash/) format.
+        //    // [multihash](https://multiformats.io/multihash/) フォーマットを使用する。
         //    .hash = "...",
         //
-        //    // When this is provided, the package is found in a directory relative to the
-        //    // build root. In this case the package's hash is irrelevant and therefore not
-        //    // computed. This field and `url` are mutually exclusive.
+        //    // これが指定されると、パッケージはビルドルートからの相対パスで
+        //    // 指定されたディレクトリ内にあるものと見なされる。
+        //    // この場合、パッケージの `hash` は不要となり、計算されない。
+        //    // このフィールドと `url` は相互に排他的である。
         //    .path = "foo",
 
-        //    // When this is set to `true`, a package is declared to be lazily
-        //    // fetched. This makes the dependency only get fetched if it is
-        //    // actually used.
+        //    // これを `true` に設定すると、パッケージは遅延フェッチされることを宣言する。
+        //    // これにより、その依存関係が実際に使用される場合にのみ取得されるようになる。
         //    .lazy = false,
         //},
     },
 
-    // Specifies the set of files and directories that are included in this package.
-    // Only files and directories listed here are included in the `hash` that
-    // is computed for this package. Only files listed here will remain on disk
-    // when using the zig package manager. As a rule of thumb, one should list
-    // files required for compilation plus any license(s).
-    // Paths are relative to the build root. Use the empty string (`""`) to refer to
-    // the build root itself.
-    // A directory listed here means that all files within, recursively, are included.
+    // このパッケージに含まれるファイルやディレクトリのセットを指定する。
+    // ここにリストされたファイルとディレクトリのみが `hash` 計算の対象となる。
+    // また、Zig パッケージマネージャーを使用する場合、ディスク上に残るのは
+    // ここにリストされたファイルのみとなる。
+    // 基本的には、コンパイルに必要なファイルとライセンスファイルを含めるのが適切。
+    //
+    // パスはビルドルートからの相対パスで指定する。
+    // 空文字列 (`""`) を指定すると、ビルドルートそのものを指す。
+    // ディレクトリをリストに追加すると、そのディレクトリ内のすべてのファイルが
+    // 再帰的に含まれる。
     .paths = .{
         "build.zig",
         "build.zig.zon",
         "src",
-        // For example...
+        // 例えば...
         //"LICENSE",
         //"README.md",
     },
