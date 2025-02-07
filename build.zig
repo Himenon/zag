@@ -34,15 +34,6 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
-    // zigzapの手順に従って追加
-    // https://github.com/zigzap/zap/?tab=readme-ov-file#using-zap-in-your-own-projects
-    const zap = b.dependency("zap", .{
-        .target = target,
-        .optimize = optimize,
-        .openssl = false, // set to true to enable TLS support
-    });
-    exe.root_module.addImport("zap", zap.module("zap"));
-
     // これは、ユーザーが `zig build` の "install" ステップを実行した際に、
     // 標準のインストール場所に実行ファイルをインストールする意図を宣言する。
     b.installArtifact(exe);
