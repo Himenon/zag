@@ -1,0 +1,83 @@
+name: Release MyTool
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: Build and Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Zig
+        uses: goto-bus-stop/setup-zig@v2
+        with:
+          version: 0.11.0 # 最新のZigバージョンを指定
+
+      - name: Build MyTool
+        run: |
+          zig build -Drelease-safe
+          mkdir dist
+          cp zig-out/bin/mytool dist/
+          tar -czvf dist/mytool-macos.tar.gz -C dist mytool
+
+      - name: Get SHA256 Checksum
+        run: |
+          shasum -a 256 dist/mytool-macos.tar.gz | awk '{print $1}' > checksum.txt
+          echo "SHA256=$(cat checksum.txt)" >> $GITHUB_ENV
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/mytool-macos.tar.gz
+
+  update-homebrew:
+    name: Update Homebrew Tap
+    runs-on: ubuntu-latest
+    needs: release
+
+    steps:
+      - name: Checkout Homebrew Tap
+        uses: actions/checkout@v4
+        with:
+          repository: yourusername/homebrew-mytool
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+
+      - name: Update Formula
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          SHA256=${{ env.SHA256 }}
+          cat <<EOF > Formula/mytool.rb
+          class Mytool < Formula
+            desc "My awesome Zig CLI tool"
+            homepage "https://github.com/yourusername/mytool"
+            url "https://github.com/yourusername/mytool/releases/download/v${VERSION}/mytool-macos.tar.gz"
+            sha256 "${SHA256}"
+            version "${VERSION}"
+
+            def install
+              bin.install "mytool"
+            end
+
+            test do
+              system "#{bin}/mytool", "--version"
+            end
+          end
+          EOF
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add Formula/mytool.rb
+          git commit -m "Update mytool to v${VERSION}"
+          git push
