@@ -10,7 +10,7 @@ jobs:
     # @see https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
     concurrency:
       group: ${{ github.workflow }}-${{ matrix.os }}-${{ github.ref }}
-      cancel-in-progress: true
+      cancel-in-progress: false
 
     strategy:
       matrix:
