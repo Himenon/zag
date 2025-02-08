@@ -26,7 +26,7 @@ jobs:
       - name: Archive Build Artifact
         run: |
           mkdir -p artifacts
-          zip -r zag.zip./zig-out/bin/
+          zip -r zag.zip ./zig-out/bin/
           mv zag.zip artifacts/
 
       - name: Upload Release Asset
