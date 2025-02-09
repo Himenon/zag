@@ -34,7 +34,7 @@ pub fn build(b: *std.Build) void {
         @tagName(target.result.os.tag),
     });
 
-    const script_content = generate_zip_script(b, arch, os);
+    const script_content = generate_zip_script(b, os, arch);
 
     var file = std.fs.cwd().createFile("./packing.sh", .{ .mode = 0o755 }) catch unreachable;
     defer file.close();
