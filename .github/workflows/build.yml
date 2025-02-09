@@ -15,10 +15,6 @@ jobs:
       group: ${{ github.workflow }}-${{ matrix.os }}-${{ github.ref }}
       cancel-in-progress: false
 
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/initialize
