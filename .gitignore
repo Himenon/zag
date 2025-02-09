@@ -11,4 +11,9 @@ build-*/
 docgen_tmp/
 zag.zip
 
+# User Settings
+
+artifacts
+pack.sh
+
 # End of https://www.toptal.com/developers/gitignore/api/zig

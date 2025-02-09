@@ -6,15 +6,14 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
 
     # @see https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
     concurrency:
       group: ${{ github.workflow }}-${{ matrix.os }}-${{ github.ref }}
       cancel-in-progress: false
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
 
     steps:
       - uses: actions/checkout@v4
