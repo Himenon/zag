@@ -7,7 +7,10 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -20,7 +23,7 @@ jobs:
         # node -e "console.log(`\${process.platform}-\${process.arch}`)"
         run: |
           zig version
-          zig build -Dtarget=aarch64-macos
+          zig build
         env:
           TAG_NAME: ${{ github.ref_name }}
 
@@ -28,7 +31,7 @@ jobs:
         run: |
           mkdir -p artifacts
           zip -r zag.zip ./zig-out/bin/
-          mv zag.zip artifacts/
+          mv zag-{os}-{arch}.zip artifacts/
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2

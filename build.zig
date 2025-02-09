@@ -1,5 +1,18 @@
 const std = @import("std");
 
+fn generate_zip_script(b: *std.Build, os: []const u8, arch: []const u8) []const u8 {
+    const zip_file_name = std.fmt.allocPrint(b.allocator, "zag-{s}-{s}.zip", .{ os, arch }) catch unreachable;
+
+    return std.fmt.allocPrint(b.allocator,
+        \\#!/bin/sh
+        \\
+        \\mkdir -p artifacts
+        \\zip -r {s} ./zig-out/bin/
+        \\mv {s} artifacts/
+        \\
+    , .{ zip_file_name, zip_file_name }) catch unreachable;
+}
+
 // この関数は命令型のように見えるが、その役割は、外部のランナーによって実行される
 // ビルドグラフを宣言的に構築することである。
 pub fn build(b: *std.Build) void {
@@ -13,12 +26,20 @@ pub fn build(b: *std.Build) void {
     // Debug、ReleaseSafe、ReleaseFast、ReleaseSmall の中から選択できる。
     // ここでは特定のリリースモードを設定せず、ユーザーが最適化方法を選択できるようにする。
     const optimize = b.standardOptimizeOption(.{});
-
+    const arch = @tagName(target.result.cpu.arch);
+    const os = @tagName(target.result.os.tag);
     // @tagNameを利用するとenumがその宣言名になって返ってくる
     std.debug.print("Building for arch: {s}, platform: {s}\n", .{
         @tagName(target.result.cpu.arch),
         @tagName(target.result.os.tag),
     });
+
+    const script_content = generate_zip_script(b, arch, os);
+
+    var file = std.fs.cwd().createFile("./pack.sh", .{ .mode = 0o755 }) catch unreachable;
+    defer file.close();
+    var writer = file.writer();
+    writer.writeAll(script_content) catch {};
 
     const lib = b.addStaticLibrary(.{
         .name = "zag",
