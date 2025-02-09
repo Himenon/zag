@@ -6,6 +6,9 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
 
     # @see https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
     concurrency:
