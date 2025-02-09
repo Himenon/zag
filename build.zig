@@ -36,7 +36,7 @@ pub fn build(b: *std.Build) void {
 
     const script_content = generate_zip_script(b, arch, os);
 
-    var file = std.fs.cwd().createFile("./pack.sh", .{ .mode = 0o755 }) catch unreachable;
+    var file = std.fs.cwd().createFile("./packing.sh", .{ .mode = 0o755 }) catch unreachable;
     defer file.close();
     var writer = file.writer();
     writer.writeAll(script_content) catch {};
