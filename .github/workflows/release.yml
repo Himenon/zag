@@ -29,9 +29,7 @@ jobs:
 
       - name: Archive Build Artifact
         run: |
-          mkdir -p artifacts
-          zip -r zag.zip ./zig-out/bin/
-          mv zag-{os}-{arch}.zip artifacts/
+          ./packing.sh
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2

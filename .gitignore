@@ -14,6 +14,6 @@ zag.zip
 # User Settings
 
 artifacts
-pack.sh
+packing.sh
 
 # End of https://www.toptal.com/developers/gitignore/api/zig
