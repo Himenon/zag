@@ -14,6 +14,12 @@ pub fn build(b: *std.Build) void {
     // ここでは特定のリリースモードを設定せず、ユーザーが最適化方法を選択できるようにする。
     const optimize = b.standardOptimizeOption(.{});
 
+    // @tagNameを利用するとenumがその宣言名になって返ってくる
+    std.debug.print("Building for arch: {s}, platform: {s}\n", .{
+        @tagName(target.result.cpu.arch),
+        @tagName(target.result.os.tag),
+    });
+
     const lib = b.addStaticLibrary(.{
         .name = "zag",
         // この場合、メインのソースファイルは単なるパスだが、より複雑なビルドスクリプトでは
