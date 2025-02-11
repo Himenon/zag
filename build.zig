@@ -1,7 +1,7 @@
 const std = @import("std");
 
-fn generate_zip_script(b: *std.Build, os: []const u8, arch: []const u8) []const u8 {
-    const zip_file_name = std.fmt.allocPrint(b.allocator, "zag-{s}-{s}.zip", .{ os, arch }) catch unreachable;
+fn generate_zip_script(b: *std.Build, platform: []const u8, arch: []const u8) []const u8 {
+    const zip_file_name = std.fmt.allocPrint(b.allocator, "zag-{s}-{s}.zip", .{ platform, arch }) catch unreachable;
 
     return std.fmt.allocPrint(b.allocator,
         \\#!/bin/sh
@@ -27,14 +27,19 @@ pub fn build(b: *std.Build) void {
     // ここでは特定のリリースモードを設定せず、ユーザーが最適化方法を選択できるようにする。
     const optimize = b.standardOptimizeOption(.{});
     const arch = @tagName(target.result.cpu.arch);
-    const os = @tagName(target.result.os.tag);
+    const platform_name = switch (target.result.os.tag) {
+        .macos => "darwin",
+        .linux => "linux",
+        .windows => "win32",
+        else => @tagName(target.result.os.tag),
+    };
     // @tagNameを利用するとenumがその宣言名になって返ってくる
     std.debug.print("Building for arch: {s}, platform: {s}\n", .{
         @tagName(target.result.cpu.arch),
-        @tagName(target.result.os.tag),
+        platform_name,
     });
 
-    const script_content = generate_zip_script(b, os, arch);
+    const script_content = generate_zip_script(b, platform_name, arch);
 
     var file = std.fs.cwd().createFile("./packing.sh", .{ .mode = 0o755 }) catch unreachable;
     defer file.close();
